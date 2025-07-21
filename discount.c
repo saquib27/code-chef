@@ -12,7 +12,6 @@ int main() {
         for (int i = 0; i < n; i++) {
             scanf("%d", &a[i]);
         }
-        // Your code goes here
         int originalprice=0;
         int priceafterdiscount=0;
         for(int i;i<n;i++){
