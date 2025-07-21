@@ -127,7 +127,6 @@ int main() {
         for (int i = 0; i < n; i++) {
             scanf("%d", &b[i]);
         }
-        // Your code goes here
         int count=n;
         for(int i=0;i<n;i++){
         if(a[i]>2*b[i] || b[i]>2*a[i]){
