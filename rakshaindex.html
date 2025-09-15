@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Raksha - Emergency SOS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/water.css/2.1.1/water.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .sos-button {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff4757, #ff3838);
+            border: none;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(255, 71, 87, 0.4);
+            margin: 20px 0;
+        }
+
+        .sos-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(255, 71, 87, 0.6);
+        }
+
+        .sos-button:active {
+            transform: scale(0.95);
+        }
+
+        .sos-button:disabled {
+            background: linear-gradient(45deg, #ccc, #bbb);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .emergency-type {
+            margin: 20px 0;
+            display: none;
+        }
+
+        .emergency-type select {
+            padding: 15px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            width: 100%;
+            max-width: 300px;
+            background: white;
+        }
+
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .status.loading {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+            display: block;
+        }
+
+        .location-info {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+            display: none;
+        }
+
+        .volunteer-link {
+            margin-top: 30px;
+            padding: 15px 30px;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            display: none;
+            transition: background 0.3s ease;
+        }
+
+        .volunteer-link:hover {
+            background: #218838;
+            color: white;
+        }
+
+        .demo-note {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 14px;
+            color: #1976d2;
+        }
+
+        @media (max-width: 600px) {
+            .sos-button {
+                width: 200px;
+                height: 200px;
+                font-size: 20px;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚨 Project Raksha</h1>
+        <p>Emergency Response System</p>
+        
+        <button id="sosButton" class="sos-button">
+            TAP FOR SOS
+        </button>
+
+        <div id="emergencyType" class="emergency-type">
+            <label for="emergencySelect">Select Emergency Type:</label>
+            <select id="emergencySelect">
+                <option value="">Choose emergency type...</option>
+                <option value="medical">🏥 Medical Emergency</option>
+                <option value="accident">🚗 Road Accident</option>
+                <option value="fire">🔥 Fire Emergency</option>
+                <option value="crime">👮 Security Threat</option>
+                <option value="other">⚠️ Other Emergency</option>
+            </select>
+        </div>
+
+        <div id="status" class="status"></div>
+        <div id="locationInfo" class="location-info"></div>
+        
+        <a href="volunteer.html" target="_blank" id="volunteerLink" class="volunteer-link">
+            🚑 Track Ambulance & Volunteers
+        </a>
+
+        <div class="demo-note">
+            <strong>Demo Instructions:</strong><br>
+            1. Click SOS button and allow location access<br>
+            2. Select emergency type<br>
+            3. Open volunteer dashboard to see real-time updates
+        </div>
+    </div>
+
+    <script>
+        // Global emergency data storage - simulates real-time database
+        // In production, this would be Firebase Firestore or similar
+        if (!window.emergencyData) {
+            window.emergencyData = [];
+        }
+        
+        class RakshaEmergencySystem {
+            constructor() {
+                this.sosButton = document.getElementById('sosButton');
+                this.emergencyTypeDiv = document.getElementById('emergencyType');
+                this.emergencySelect = document.getElementById('emergencySelect');
+                this.statusDiv = document.getElementById('status');
+                this.locationInfoDiv = document.getElementById('locationInfo');
+                this.volunteerLink = document.getElementById('volunteerLink');
+                
+                this.currentLocation = null;
+                this.initializeEventListeners();
+            }
+
+            initializeEventListeners() {
+                this.sosButton.addEventListener('click', () => this.handleSOSPress());
+                this.emergencySelect.addEventListener('change', () => this.handleEmergencyTypeSelection());
+            }
+
+            async handleSOSPress() {
+                try {
+                    // Disable button to prevent multiple clicks
+                    this.sosButton.disabled = true;
+                    this.sosButton.textContent = 'GETTING LOCATION...';
+                    this.showStatus('🌍 Getting your precise location...', 'loading');
+                    
+                    // Use Geolocation API to get current coordinates
+                    const position = await this.getCurrentPosition();
+                    const { latitude, longitude, accuracy } = position.coords;
+                    
+                    // Store location data
+                    this.currentLocation = { 
+                        latitude, 
+                        longitude, 
+                        accuracy,
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    // Show location information
+                    this.displayLocationInfo(latitude, longitude, accuracy);
+                    
+                    // Show emergency type selection
+                    this.emergencyTypeDiv.style.display = 'block';
+                    this.showStatus('✅ Location obtained! Please select emergency type.', 'success');
+                    
+                } catch (error) {
+                    this.showStatus(`❌ Error: ${error.message}`, 'error');
+                    this.resetSOSButton();
+                }
+            }
+
+            getCurrentPosition() {
+                return new Promise((resolve, reject) => {
+                    // Check if geolocation is supported
+                    if (!navigator.geolocation) {
+                        reject(new Error('Geolocation is not supported by this browser'));
+                        return;
+                    }
+
+                    // Get current position with high accuracy
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => resolve(position),
+                        (error) => {
+                            // Handle geolocation errors
+                            switch(error.code) {
+                                case error.PERMISSION_DENIED:
+                                    reject(new Error('Location access denied. Please allow location access and try again.'));
+                                    break;
+                                case error.POSITION_UNAVAILABLE:
+                                    reject(new Error('Location information is unavailable. Please check your GPS/network.'));
+                                    break;
+                                case error.TIMEOUT:
+                                    reject(new Error('Location request timed out. Please try again.'));
+                                    break;
+                                default:
+                                    reject(new Error('An unknown location error occurred.'));
+                                    break;
+                            }
+                        },
+                        {
+                            enableHighAccuracy: true,    // Use GPS for better accuracy
+                            timeout: 15000,              // 15 second timeout
+                            maximumAge: 60000            // Accept cached position up to 1 minute old
+                        }
+                    );
+                });
+            }
+
+            handleEmergencyTypeSelection() {
+                const selectedType = this.emergencySelect.value;
+                if (selectedType && this.currentLocation) {
+                    this.sendEmergencyAlert(selectedType);
+                }
+            }
+
+            sendEmergencyAlert(emergencyType) {
+                // Create emergency object
+                const emergency = {
+                    id: Date.now(),
+                    type: emergencyType,
+                    latitude: this.currentLocation.latitude,
+                    longitude: this.currentLocation.longitude,
+                    accuracy: this.currentLocation.accuracy,
+                    timestamp: new Date().toISOString(),
+                    status: 'active',
+                    userId: 'user_' + Math.random().toString(36).substr(2, 9) // Demo user ID
+                };
+
+                // Store emergency in global data (simulating real-time database)
+                window.emergencyData.push(emergency);
+                
+                // Simulate real-time notification to volunteers
+                this.notifyVolunteers(emergency);
+                
+                // Update UI
+                this.showStatus('🚨 Emergency alert sent! Notifying nearby volunteers...', 'loading');
+                this.volunteerLink.style.display = 'inline-block';
+                
+                // Simulate volunteer response timeline
+                this.simulateVolunteerResponse();
+                
+                console.log('📡 Emergency alert sent:', emergency);
+            }
+
+            notifyVolunteers(emergency) {
+                // In production, this would:
+                // 1. Send POST request to backend API
+                // 2. Backend finds nearby volunteers using geospatial queries
+                // 3. Send push notifications via Firebase Cloud Messaging
+                // 4. Update volunteer dashboards via WebSocket/Pusher channels
+                
+                // Dispatch custom event for any open volunteer dashboards
+                const event = new CustomEvent('newEmergency', { 
+                    detail: emergency 
+                });
+                window.dispatchEvent(event);
+                
+                // Store in localStorage as backup (for demo purposes)
+                try {
+                    const stored = JSON.parse(localStorage.getItem('rakshaEmergencies') || '[]');
+                    stored.push(emergency);
+                    localStorage.setItem('rakshaEmergencies', JSON.stringify(stored));
+                } catch (e) {
+                    console.log('localStorage not available, using in-memory storage only');
+                }
+            }
+
+            simulateVolunteerResponse() {
+                // Simulate realistic response timeline
+                setTimeout(() => {
+                    this.showStatus('📱 3 volunteers notified in your area...', 'loading');
+                }, 1000);
+                
+                setTimeout(() => {
+                    this.showStatus('✅ Volunteer "Dr. Sarah M." is responding! ETA: 8 minutes', 'success');
+                }, 3000);
+                
+                setTimeout(() => {
+                    this.showStatus('🚑 Help is on the way! Volunteer has your exact location.', 'success');
+                }, 5000);
+            }
+
+            displayLocationInfo(lat, lng, accuracy) {
+                this.locationInfoDiv.innerHTML = `
+                    <strong>📍 Your Emergency Location:</strong><br>
+                    <strong>Latitude:</strong> ${lat.toFixed(6)}<br>
+                    <strong>Longitude:</strong> ${lng.toFixed(6)}<br>
+                    <strong>Accuracy:</strong> ±${Math.round(accuracy)}m<br>
+                    <small>🕒 Obtained: ${new Date().toLocaleTimeString()}</small>
+                `;
+                this.locationInfoDiv.style.display = 'block';
+            }
+
+            showStatus(message, type) {
+                this.statusDiv.textContent = message;
+                this.statusDiv.className = `status ${type}`;
+            }
+
+            resetSOSButton() {
+                this.sosButton.disabled = false;
+                this.sosButton.textContent = 'TAP FOR SOS';
+            }
+
+            getEmergencyTypeLabel(type) {
+                const labels = {
+                    'medical': '🏥 Medical Emergency',
+                    'accident': '🚗 Road Accident', 
+                    'fire': '🔥 Fire Emergency',
+                    'crime': '👮 Security Threat',
+                    'other': '⚠️ Other Emergency'
+                };
+                return labels[type] || type;
+            }
+
+            findNearbyVolunteers() {
+                // Simulate finding nearby volunteers based on current location
+                // In production, this would query a geospatial database
+                this.nearbyVolunteers = [
+                    {
+                        id: 'vol_1',
+                        name: 'Dr. Sarah Martinez',
+                        specialty: 'Emergency Medicine',
+                        distance: 0.8,
+                        eta: 8,
+                        avatar: 'SM',
+                        status: 'notified',
+                        rating: 4.9,
+                        responseCount: 156
+                    },
+                    {
+                        id: 'vol_2', 
+                        name: 'Jake Thompson',
+                        specialty: 'First Aid Certified',
+                        distance: 1.2,
+                        eta: 7,
+                        avatar: 'JT',
+                        status: 'notified',
+                        rating: 4.7,
+                        responseCount: 89
+                    },
+                    {
+                        id: 'vol_3',
+                        name: 'Maria Rodriguez',
+                        specialty: 'Paramedic',
+                        distance: 1.5,
+                        eta: 9,
+                        avatar: 'MR', 
+                        status: 'notified',
+                        rating: 4.8,
+                        responseCount: 203
+                    }
+                ];
+            }
+
+            updateVolunteerStats(notified, responding, avgEta) {
+                this.notifiedCount.textContent = notified;
+                this.respondingCount.textContent = responding;
+                this.avgETA.textContent = avgEta;
+            }
+
+            updateVolunteersList(stage) {
+                if (stage === 'notified') {
+                    // Show all volunteers as notified
+                    this.volunteersList.innerHTML = this.nearbyVolunteers.map(volunteer => 
+                        this.createVolunteerCard(volunteer, 'notified')
+                    ).join('');
+                } else if (stage === 'responding') {
+                    // Update first volunteer to responding
+                    this.nearbyVolunteers[0].status = 'responding';
+                    this.nearbyVolunteers[0].eta = 8;
+                    this.volunteersList.innerHTML = this.nearbyVolunteers.map(volunteer => 
+                        this.createVolunteerCard(volunteer, volunteer.status)
+                    ).join('');
+                } else if (stage === 'enroute') {
+                    // Update two volunteers to en route
+                    this.nearbyVolunteers[0].status = 'enroute';
+                    this.nearbyVolunteers[0].eta = 6;
+                    this.nearbyVolunteers[1].status = 'enroute';
+                    this.nearbyVolunteers[1].eta = 7;
+                    this.volunteersList.innerHTML = this.nearbyVolunteers.map(volunteer => 
+                        this.createVolunteerCard(volunteer, volunteer.status)
+                    ).join('');
+                }
+            }
+
+            createVolunteerCard(volunteer, status) {
+                const statusClasses = {
+                    'notified': 'status-notified',
+                    'responding': 'status-responding', 
+                    'enroute': 'status-enroute'
+                };
+
+                const statusLabels = {
+                    'notified': 'Notified',
+                    'responding': 'Responding',
+                    'enroute': 'En Route'
+                };
+
+                return `
+                    <div class="volunteer-card">
+                        <div class="volunteer-avatar">${volunteer.avatar}</div>
+                        <div class="volunteer-info">
+                            <div class="volunteer-name">${volunteer.name}</div>
+                            <div class="volunteer-details">
+                                <span>🏥 ${volunteer.specialty}</span>
+                                <span>📍 ${volunteer.distance} km away</span>
+                                <span>⭐ ${volunteer.rating} (${volunteer.responseCount} responses)</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span class="volunteer-status ${statusClasses[status]}">
+                                ${statusLabels[status]}
+                            </span>
+                            ${status !== 'notified' ? `<span class="volunteer-eta">ETA: ${volunteer.eta} min</span>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize the emergency system when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new RakshaEmergencySystem();
+        });
+
+        /*
+        ==========================================
+        PRODUCTION IMPLEMENTATION ROADMAP:
+        ==========================================
+        
+        1. BACKEND API INTEGRATION:
+           - Replace window.emergencyData with REST API calls
+           - POST /api/emergency to create new emergency
+           - GET /api/volunteers/nearby to find available volunteers
+           - WebSocket connection for real-time updates
+           
+        2. REAL-TIME DATABASE:
+           - Firebase Firestore with geo-queries:
+             db.collection('emergencies').add(emergency)
+             db.collection('volunteers').where('location', 'near', userLocation)
+           - MongoDB with geospatial indexing
+           - PostgreSQL with PostGIS extension
+           
+        3. VOLUNTEER NOTIFICATION SYSTEM:
+           - Push notifications via Firebase Cloud Messaging
+           - SMS alerts via Twilio API  
+           - Email notifications via SendGrid
+           - In-app notifications via Pusher/Socket.IO
+           
+        4. SECURITY & PRIVACY:
+           - JWT authentication for users and volunteers
+           - Encrypt location data in transit and at rest
+           - GDPR compliance for location data storage
+           - Rate limiting to prevent spam alerts
+           
+        5. MOBILE APP FEATURES:
+           - Progressive Web App (PWA) with offline capability
+           - Background geolocation tracking
+           - One-tap emergency contacts notification
+           - Integration with device emergency features
+           
+        6. VOLUNTEER MATCHING ALGORITHM:
+           - Distance-based volunteer selection
+           - Skill matching (medical training, fire safety, etc.)
+           - Availability status checking
+           - Load balancing across volunteers
+        */
+    </script>
+</body>
+</html>
