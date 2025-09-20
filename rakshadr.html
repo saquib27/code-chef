@@ -1,0 +1,287 @@
+<!--
+README - Project RakshaOne Landing Page
+---------------------------------------
+- Open this file in any modern browser (Chrome, Firefox, Edge, Safari).
+- The SOS button opens a demo modal simulating an emergency dispatch.
+- Emergency counters animate on load.
+- Volunteer Registration form validates inputs, then simulates adding a volunteer.
+- QR code is a lightweight placeholder SVG.
+- Replace placeholder SVGs, stats, and partner logos with production assets.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RakshaOne - Community-Powered Emergency Response</title>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700&family=Open+Sans&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    :root {
+      --red: #DC2626;
+      --blue: #2563EB;
+      --gray: #4B5563;
+      --bg-light: #f9fafb;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Open Sans', Arial, sans-serif;
+      color: var(--gray);
+      background: #fff;
+      line-height: 1.6;
+    }
+    h1,h2,h3,h4 { font-family: 'Inter', sans-serif; }
+    a { text-decoration: none; color: var(--blue); }
+    header {
+      background: #fff;
+      border-bottom: 1px solid #eee;
+      position: sticky; top: 0; z-index: 999;
+    }
+    nav {
+      max-width: 1200px; margin: auto;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.5rem 1rem;
+    }
+    .logo { display: flex; align-items: center; font-weight: 700; color: var(--gray);}
+    .logo svg { width: 24px; height: 24px; fill: var(--red); margin-right: 8px; }
+    .nav-links { display: flex; gap: 1rem; }
+    .nav-links a { font-weight: 600; }
+    .lang-select { margin-left: 1rem; }
+    .sos-btn {
+      background: var(--red); color: #fff; border: none; border-radius: 6px;
+      padding: 0.5rem 1rem; font-weight: 700; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .sos-btn:hover { background: #b91c1c; }
+    /* Hero */
+    .hero {
+      max-width: 1200px; margin: auto; padding: 2rem 1rem;
+      display: grid; grid-template-columns: 1fr; gap: 2rem;
+      text-align: center;
+    }
+    .hero h1 { font-size: 2rem; color: var(--red); margin-bottom: 1rem;}
+    .hero h2 { font-size: 1.2rem; margin-bottom: 1rem;}
+    .stats { display: flex; justify-content: center; gap: 2rem; margin: 1rem 0;}
+    .stat { font-weight: 700; font-size: 1.1rem;}
+    .cta { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+    .btn { padding: 0.75rem 1.5rem; border-radius: 6px; font-weight: 700; cursor: pointer; }
+    .btn-primary { background: var(--red); color:#fff;}
+    .btn-primary:hover { background: #b91c1c;}
+    .btn-secondary { background: var(--blue); color:#fff;}
+    .btn-secondary:hover { background: #1e3a8a;}
+    .phone-mockup {
+      width: 200px; height: 400px; border: 8px solid #333; border-radius: 24px;
+      margin: auto; background: #fafafa; display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; font-weight: 600; color: var(--red);
+    }
+    /* Sections */
+    section { padding: 3rem 1rem; max-width: 1200px; margin:auto;}
+    .features { display: grid; gap: 1.5rem; grid-template-columns: 1fr; text-align: center; }
+    .features div { padding:1rem; border:1px solid #eee; border-radius:8px; background:#fff;}
+    @media(min-width:768px){.features{grid-template-columns:repeat(3,1fr);} .hero{grid-template-columns:1fr 1fr; text-align:left; align-items:center;}}
+
+    /* How It Works */
+    .steps { display:grid; gap:1rem; grid-template-columns:1fr; text-align:center;}
+    .step { background: var(--bg-light); padding:1rem; border-radius:8px;}
+    @media(min-width:768px){.steps{grid-template-columns:repeat(4,1fr);} }
+
+    /* Tech cards */
+    .tech { display:grid; gap:1rem; grid-template-columns:1fr; }
+    .tech div { background:#fff; border:1px solid #eee; border-radius:8px; padding:1rem; }
+    @media(min-width:768px){.tech{grid-template-columns:repeat(4,1fr);} }
+
+    /* Community */
+    .testimonials { display:grid; gap:1rem; grid-template-columns:1fr; }
+    .testimonial { background:#fff; border:1px solid #eee; border-radius:8px; padding:1rem; }
+    @media(min-width:768px){.testimonials{grid-template-columns:repeat(3,1fr);} }
+
+    /* Download */
+    .download { text-align:center;}
+    .store-badges { display:flex; gap:1rem; justify-content:center; margin:1rem 0;}
+    .qr { margin:1rem auto; width:120px; height:120px; background:#eee; display:flex; align-items:center; justify-content:center;}
+
+    /* Footer */
+    footer { background:var(--gray); color:#fff; padding:2rem 1rem; }
+    .footer-grid { display:grid; gap:1rem; grid-template-columns:1fr; }
+    @media(min-width:768px){.footer-grid{grid-template-columns:repeat(3,1fr);} }
+    .social { margin-top:1rem; display:flex; gap:1rem; }
+
+    /* Modal */
+    .modal { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center;}
+    .modal-content { background:#fff; padding:2rem; border-radius:8px; max-width:400px; text-align:center;}
+    .close { position:absolute; top:10px; right:20px; cursor:pointer; font-size:1.5rem; }
+  </style>
+</head>
+<body>
+<header>
+  <nav>
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><path d="M12 1l9 4v6c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V5l9-4z"/></svg>
+      RakshaOne
+    </div>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#how">How It Works</a>
+      <a href="#community">Volunteers</a>
+      <a href="#download">Download</a>
+      <select class="lang-select" aria-label="Language">
+        <option>EN</option><option>HI</option>
+      </select>
+      <button class="sos-btn" id="sosBtn">SOS</button>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <!-- Hero -->
+  <section class="hero">
+    <div>
+      <h1>Emergency Response in One Tap - Help Arrives Faster</h1>
+      <h2>Community-powered emergency response system connecting those in need with verified volunteers</h2>
+      <div class="stats">
+        <div class="stat"><span id="emergencies">0</span> emergencies responded</div>
+        <div class="stat"><span id="volunteers">0</span> volunteers active</div>
+      </div>
+      <div class="cta">
+        <button class="btn btn-primary">Download the App — Your Lifeline in Pocket</button>
+        <button class="btn btn-secondary">Become a Volunteer</button>
+      </div>
+    </div>
+    <div class="phone-mockup">SOS Alert</div>
+  </section>
+
+  <!-- Features -->
+  <section id="features">
+    <h2>Emergency Features</h2>
+    <div class="features">
+      <div><i class="fa-solid fa-bell"></i><h3>One-Tap SOS</h3><p>Immediate alert with location sharing</p></div>
+      <div><i class="fa-solid fa-users"></i><h3>Volunteer Network</h3><p>Verified community responders</p></div>
+      <div><i class="fa-solid fa-location-dot"></i><h3>Live Tracking</h3><p>Real-time response progress</p></div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section id="how">
+    <h2>How It Works</h2>
+    <div class="steps">
+      <div class="step"><h3>1</h3><p>Emergency detected (SOS activated)</p></div>
+      <div class="step"><h3>2</h3><p>Alert dispatched (Volunteers + Authorities)</p></div>
+      <div class="step"><h3>3</h3><p>Help en route (Live tracking)</p></div>
+      <div class="step"><h3>4</h3><p>Situation resolved (Confirmation system)</p></div>
+    </div>
+  </section>
+
+  <!-- Technology -->
+  <section>
+    <h2>Technology Stack</h2>
+    <div class="tech">
+      <div><i class="fa-solid fa-brain"></i><h3>AI-Powered Response</h3><p>Smart emergency categorization</p></div>
+      <div><i class="fa-solid fa-link"></i><h3>Blockchain Security</h3><p>Tamper-proof emergency records</p></div>
+      <div><i class="fa-solid fa-map-location-dot"></i><h3>GPS Precision</h3><p>Accurate location tracking</p></div>
+      <div><i class="fa-solid fa-mobile"></i><h3>Multi-Platform</h3><p>Works on all devices</p></div>
+    </div>
+  </section>
+
+  <!-- Community Impact -->
+  <section id="community">
+    <h2>Community Impact</h2>
+    <div class="testimonials">
+      <div class="testimonial">"RakshaOne saved my father’s life. Volunteers were at our home in minutes." - Aditi</div>
+      <div class="testimonial">"I feel empowered as a volunteer, knowing I can help in emergencies." - Rohan</div>
+      <div class="testimonial">"Partnerships with local NGOs amplify our reach and impact." - Partner Org</div>
+    </div>
+  </section>
+
+  <!-- Download -->
+  <section id="download" class="download">
+    <h2>Download RakshaOne</h2>
+    <div class="store-badges">
+      <button class="btn btn-primary"><i class="fa-brands fa-google-play"></i> Google Play</button>
+      <button class="btn btn-secondary"><i class="fa-brands fa-apple"></i> App Store</button>
+    </div>
+    <div class="qr">QR</div>
+    <p>Your lifeline in your pocket. Scan to download.</p>
+  </section>
+</main>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <h3>24/7 Support</h3>
+      <p>Phone: +91-999-999-9999</p>
+      <p>Email: support@rakshaone.org</p>
+    </div>
+    <div>
+      <h3>Emergency Resources</h3>
+      <details><summary>Resources</summary>
+        <ul>
+          <li><a href="#">First Aid Guide</a></li>
+          <li><a href="#">Nearby Hospitals</a></li>
+          <li><a href="#">Police Helpline</a></li>
+        </ul>
+      </details>
+    </div>
+    <div>
+      <h3>Privacy & Security</h3>
+      <p>Your data is protected with blockchain records.</p>
+      <div class="social">
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-facebook"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- SOS Modal -->
+<div class="modal" id="sosModal" role="dialog" aria-modal="true" aria-labelledby="sosTitle">
+  <div class="modal-content">
+    <span class="close" id="closeModal">&times;</span>
+    <h2 id="sosTitle">SOS Activated</h2>
+    <p>Location detected: Lat 28.61, Long 77.23 (simulated)</p>
+    <button class="btn btn-primary" id="dispatchBtn">Confirm Dispatch</button>
+    <p id="dispatchStatus"></p>
+  </div>
+</div>
+
+<script>
+  // Counter animation
+  function animateValue(id, start, end, duration) {
+    let obj = document.getElementById(id);
+    let range = end - start;
+    let startTime = null;
+    function step(timestamp) {
+      if (!startTime) startTime = timestamp;
+      let progress = Math.min((timestamp - startTime) / duration, 1);
+      obj.textContent = Math.floor(progress * range + start);
+      if (progress < 1) window.requestAnimationFrame(step);
+    }
+    window.requestAnimationFrame(step);
+  }
+  window.addEventListener('load', () => {
+    animateValue("emergencies", 0, 12456, 2000);
+    animateValue("volunteers", 0, 3200, 2000);
+  });
+
+  // SOS Modal
+  const sosBtn = document.getElementById('sosBtn');
+  const modal = document.getElementById('sosModal');
+  const closeModal = document.getElementById('closeModal');
+  const dispatchBtn = document.getElementById('dispatchBtn');
+  const dispatchStatus = document.getElementById('dispatchStatus');
+  sosBtn.addEventListener('click', ()=>{ modal.style.display='flex'; });
+  closeModal.addEventListener('click', ()=>{ modal.style.display='none'; dispatchStatus.textContent=''; });
+  dispatchBtn.addEventListener('click', ()=>{
+    dispatchStatus.textContent='Volunteers are en route... (simulated)';
+  });
+  window.addEventListener('keydown', e=>{ if(e.key==='Escape'){modal.style.display='none'; dispatchStatus.textContent='';}});
+</script>
+</body>
+</html>
